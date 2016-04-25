@@ -1,5 +1,6 @@
 var React = require('react');
 var Battle = require('../components/Battle');
+var githubHelpers = require('../utils/githubHelpers');
 
 var BattleContainer = React.createClass({
   contextTypes: {
@@ -13,13 +14,29 @@ var BattleContainer = React.createClass({
   },
   componentDidMount: function() {
     var query = this.props.location.query;
-    console.log('Query', query);
+    githubHelpers.getPlayersInfo([query.playerOne, query.playerTwo])
+    .then(function (players) {
+      this.setState({
+        isLoading: false,
+        playersInfo: [players[0], players[1]] 
+      });
+    }.bind(this));
+  },
+  handleInitiateBattle: function() {
+    this.context.router.push({
+      pathname: '/results',
+      state: {
+        playersInfo: this.state.playersInfo
+      }
+    });
   },
   render: function() {
     return (
       <Battle 
         isLoading={this.state.isLoading}
-        playersInfo={this.state.playersInfo} />
+        playersInfo={this.state.playersInfo} 
+        onInitiateBattle={this.handleInitiateBattle}
+      />
     );
   }
 });
