@@ -1,8 +1,8 @@
-var axios = require('axios');
+import axios from 'axios';
 
-var id = "YOURE_CLIENT_ID";
-var sec = "YOUR_SECRET_ID";
-var param = `?client_id=${id}&client_secret=${sec}`;
+const id = "YOURE_CLIENT_ID";
+const sec = "YOUR_SECRET_ID";
+const param = `?client_id=${id}&client_secret=${sec}`;
 
 function getUserInfo(username) {
   return axios.get(`https://api.github.com/users/${username + param}`);
@@ -13,20 +13,22 @@ function getRepos(username) {
 }
 
 function getTotalStars(repos) {
-  return repos.data.reduce(function(prev, current) {
+  return repos.data.reduce((prev, current) => {
     return prev + current.stargazers_count;
   }, 0);
 }
 
-function getPlayersData(player) {
-  return getRepos(player.login)
-  .then(getTotalStars)
-  .then(function(totalStars) {
+async function getPlayersData(player) {
+  try {
+    const repos = await getRepos(player.login);
+    const totalStars = await getTotalStars(repos);
     return {
       followers: player.followers,
-      totalStars: totalStars
+      totalStars
     }
-  });
+  } catch(error) {
+    console.warn(`Error in getPlayersData ${error}`);
+  }
 }
 
 function calculateScores(players) {
@@ -36,26 +38,22 @@ function calculateScores(players) {
   ];
 }
 
-var helpers = {
-  getPlayersInfo: function(players) {
-    return axios.all(players.map(function(username) {
-      return getUserInfo(username);
-    })).then(function(info) {
-      return info.map(function(user) {
-        return user.data;
-      });
-    }).catch(function(err) {
-      console.warn('Error in getPlayersInfo', err);
-    });
-  },
-  battle: function(players) {
-    var playerOneData = getPlayersData(players[0]);
-    var playerTwoData = getPlayersData(players[1]);
-
-    return axios.all([playerOneData, playerTwoData])
-      .then(calculateScores)
-      .catch(function(err) { console.warn(`Error in battle: ${err}`) });
+export async function getPlayersInfo(players) {
+  try {
+    const info = await Promise.all(players.map((username) => getUserInfo(username)));
+    return info.map((user) => user.data);
+  } catch(error) {
+    console.warn(`Error in getPlayersInfo: ${error}`);
   }
-};
+}
 
-module.exports = helpers;
+export async function battle(players) {
+  try {
+    const playerOneData = getPlayersData(players[0]);
+    const playerTwoData = getPlayersData(players[1]);
+    const data = await Promise.all([playerOneData, playerTwoData]);
+    return await calculateScores(data);
+  } catch(error) {
+    console.warn(`Error in battle: ${error}`);
+  }
+}

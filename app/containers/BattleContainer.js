@@ -1,28 +1,33 @@
-var React = require('react');
-var Battle = require('../components/Battle');
-var githubHelpers = require('../utils/githubHelpers');
+import React from 'react';
+import Battle from '../components/Battle';
+import { getPlayersInfo } from '../utils/githubHelpers';
 
-var BattleContainer = React.createClass({
+const BattleContainer = React.createClass({
   contextTypes: {
     router: React.PropTypes.object.isRequired
   },
-  getInitialState: function() {
+  getInitialState() {
     return {
       isLoading: true,
       playersInfo: []
     }
   },
-  componentDidMount: function() {
-    var query = this.props.location.query;
-    githubHelpers.getPlayersInfo([query.playerOne, query.playerTwo])
-    .then(function (players) {
+  //needs async keyword before function name to use async/await
+  async componentDidMount() {
+    const { query } = this.props.location;
+
+    try {
+      //pause here until players resolves
+      const players = await getPlayersInfo([query.playerOne, query.playerTwo])
       this.setState({
         isLoading: false,
-        playersInfo: [players[0], players[1]] 
+        playersInfo: [players[0], players[1]]
       });
-    }.bind(this));
+    } catch(error) {
+      console.warn(`Error in BattleContainer: ${error}`);
+    }
   },
-  handleInitiateBattle: function() {
+  handleInitiateBattle() {
     this.context.router.push({
       pathname: '/results',
       state: {
@@ -30,15 +35,15 @@ var BattleContainer = React.createClass({
       }
     });
   },
-  render: function() {
+  render() {
     return (
-      <Battle 
+      <Battle
         isLoading={this.state.isLoading}
-        playersInfo={this.state.playersInfo} 
+        playersInfo={this.state.playersInfo}
         onInitiateBattle={this.handleInitiateBattle}
       />
     );
   }
 });
 
-module.exports = BattleContainer;
+export default BattleContainer;

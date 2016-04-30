@@ -1,15 +1,14 @@
-var React = require('react');
-var PropTypes = React.PropTypes;
-var styles = require('../styles');
-var UserDetails = require('./UserDetails');
-var UserDetailsWrapper = require('./UserDetailsWrapper');
-var Link = require('react-router').Link;
-var MainContainer = require('./MainContainer');
-var Loading = require('./Loading');
+import React, { PropTypes } from 'react';
+import { space } from '../styles';
+import UserDetails from './UserDetails';
+import UserDetailsWrapper from './UserDetailsWrapper';
+import { Link } from 'react-router';
+import MainContainer from './MainContainer';
+import Loading from './Loading';
 
-var StartOver = function() {
+function StartOver() {
   return (
-    <div className='col-sm-12' style={styles.space}>
+    <div className='col-sm-12' style={space}>
       <Link to='/playerOne'>
         <button type='button' className='btn btn-lg btn-danger'>Start Over</button>
       </Link>
@@ -17,8 +16,8 @@ var StartOver = function() {
   );
 }
 
-function Results (props) {
-  if (props.scores[0] === props.scores[1]) {
+function Results ({ scores, playersInfo, isLoading }) {
+  if (scores[0] === scores[1]) {
     return (
       <MainContainer>
         <h1>It's a tie!!</h1>
@@ -27,19 +26,19 @@ function Results (props) {
     );
   }
 
-  var winningIndex = props.scores[0] > props.scores[1] ? 0 : 1;
-  var losingIndex = winningIndex ? 0 : 1;
+  const winningIndex = scores[0] > scores[1] ? 0 : 1;
+  const losingIndex = winningIndex ? 0 : 1;
 
-  return ( props.isLoading
+  return ( isLoading
     ?  <Loading />
     :  <MainContainer>
          <h1>Results</h1>
          <div className='col-sm-8 col-sm-offset-2'>
            <UserDetailsWrapper header='Winner'>
-             <UserDetails score={props.scores[winningIndex]} info={props.playersInfo[winningIndex]} />
+             <UserDetails score={scores[winningIndex]} info={playersInfo[winningIndex]} />
            </UserDetailsWrapper>
            <UserDetailsWrapper header='Loser'>
-             <UserDetails score={props.scores[losingIndex]} info={props.playersInfo[losingIndex]} />
+             <UserDetails score={scores[losingIndex]} info={playersInfo[losingIndex]} />
            </UserDetailsWrapper>
          </div>
          <StartOver />
@@ -53,4 +52,4 @@ Results.propTypes = {
   playersInfo: PropTypes.array.isRequired
 }
 
-module.exports = Results;
+export default Results;

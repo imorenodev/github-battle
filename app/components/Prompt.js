@@ -1,7 +1,6 @@
-var React = require('react');
-var PropTypes = React.PropTypes;
+import React, { PropTypes } from 'react';
 
-var Prompt = function(props) {
+const Prompt = function(props) {
   return (
     <div className='jumbotron col-sm-6 col-sm-offset-3 text-center' style={props.styles} >
       <h1>{props.headerText}</h1>
@@ -37,4 +36,4 @@ Prompt.propTypes = {
   username: PropTypes.string.isRequired
 };
 
-module.exports = Prompt;
+export default Prompt;

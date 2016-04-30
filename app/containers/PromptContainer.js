@@ -1,8 +1,8 @@
-var React = require('react');
-var transparentBg = require('../styles').transparentBg;
-var Prompt = require('../components/Prompt');
+import React from 'react';
+import { transparentBg } from '../styles';
+import Prompt from '../components/Prompt';
 
-var PromptContainer = React.createClass({
+const PromptContainer = React.createClass({
   contextTypes: {
     router: React.PropTypes.object.isRequired
   },
@@ -18,29 +18,30 @@ var PromptContainer = React.createClass({
   },
   handleSubmitUser: function(e) {
     e.preventDefault();
-    var username = this.state.username;
+    const { username } = this.state;
     this.setState({
       username: ''
     });
 
+    const { playerOne } = this.props.routeParams;
     // checking for routeParams (<Route path='playerTwo/:playerOne' ... /> if playerOne is a routeParam then we must be on the /playerTwo route
-    if (this.props.routeParams.playerOne) {
+    if (playerOne) {
       this.context.router.push({
         pathname: '/battle',
         query: { //will be passed as properties via this.props.location.query in the child
-          playerOne: this.props.routeParams.playerOne,
-          playerTwo: this.state.username
+          playerOne,
+          playerTwo: username
         }
       });
     } else {
-      this.context.router.push('/playerTwo/' + this.state.username)
+      this.context.router.push(`/playerTwo/${username}`)
     }
   },
   render: function() {
     return (
-      <Prompt 
+      <Prompt
         headerText={this.props.route.header}
-        styles={transparentBg} 
+        styles={transparentBg}
         onSubmitUser={this.handleSubmitUser}
         placeholderText='Github Username'
         onUpdateUser={this.handleUpdateUser}
@@ -50,4 +51,4 @@ var PromptContainer = React.createClass({
   }
 });
 
-module.exports = PromptContainer;
+export default PromptContainer;
