@@ -2,21 +2,19 @@ import React from 'react';
 import { transparentBg } from '../styles';
 import Prompt from '../components/Prompt';
 
-const PromptContainer = React.createClass({
-  contextTypes: {
-    router: React.PropTypes.object.isRequired
-  },
-  getInitialState: function() {
-    return {
+class PromptContainer extends React.Component {
+  constructor() {
+    super();
+    this.state = {
       username: ''
-    }
-  },
-  handleUpdateUser: function(e) {
+    };
+  } 
+  handleUpdateUser(e) {
     this.setState({
       username: e.target.value
     });
-  },
-  handleSubmitUser: function(e) {
+  }
+  handleSubmitUser(e) {
     e.preventDefault();
     const { username } = this.state;
     this.setState({
@@ -36,19 +34,23 @@ const PromptContainer = React.createClass({
     } else {
       this.context.router.push(`/playerTwo/${username}`)
     }
-  },
-  render: function() {
+  }
+  render() {
     return (
       <Prompt
         headerText={this.props.route.header}
         styles={transparentBg}
-        onSubmitUser={this.handleSubmitUser}
+        onSubmitUser={this.handleSubmitUser.bind(this)}
         placeholderText='Github Username'
-        onUpdateUser={this.handleUpdateUser}
+        onUpdateUser={this.handleUpdateUser.bind(this)}
         username={this.state.username}
       />
     );
   }
-});
+}
+
+PromptContainer.contextTypes = {
+    router: React.PropTypes.object.isRequired
+};
 
 export default PromptContainer;

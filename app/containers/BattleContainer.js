@@ -2,16 +2,14 @@ import React from 'react';
 import Battle from '../components/Battle';
 import { getPlayersInfo } from '../utils/githubHelpers';
 
-const BattleContainer = React.createClass({
-  contextTypes: {
-    router: React.PropTypes.object.isRequired
-  },
-  getInitialState() {
-    return {
+class BattleContainer extends React.Component {
+  constructor() {
+    super();
+    this.state = {
       isLoading: true,
       playersInfo: []
-    }
-  },
+    };
+  }
   //needs async keyword before function name to use async/await
   async componentDidMount() {
     const { query } = this.props.location;
@@ -26,7 +24,7 @@ const BattleContainer = React.createClass({
     } catch(error) {
       console.warn(`Error in BattleContainer: ${error}`);
     }
-  },
+  }
   handleInitiateBattle() {
     this.context.router.push({
       pathname: '/results',
@@ -34,16 +32,20 @@ const BattleContainer = React.createClass({
         playersInfo: this.state.playersInfo
       }
     });
-  },
+  }
   render() {
     return (
       <Battle
         isLoading={this.state.isLoading}
         playersInfo={this.state.playersInfo}
-        onInitiateBattle={this.handleInitiateBattle}
+        onInitiateBattle={this.handleInitiateBattle.bind(this)}
       />
     );
   }
-});
+}
+
+BattleContainer.contextTypes = {
+  router: React.PropTypes.object.isRequired
+};
 
 export default BattleContainer;
